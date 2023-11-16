@@ -1,98 +1,45 @@
 #include "monty.h"
 
+monty_t m = {NULL, NULL, NULL, 0};
 /**
- * main - main function
- * @argc: argument count
- * @argv: argument vector
- *
- * Return: zero(0)
+ * main - entry point of monty code interpreter
+ * @argc: number of arguments
+ * @argv: argument vector monty file
+ * Return: Return(0) on success
  */
-
 int main(int argc, char *argv[])
 {
+char *content;
+FILE *file;
+size_t size = 0;
+ssize_t read_line = 1;
+stack_t *stack = NULL;
+unsigned int line_n = 0;
+
 if (argc != 2)
 {
 fprintf(stderr, "USAGE: monty file\n");
 exit(EXIT_FAILURE);
 }
-
-FILE *file = fopen(argv[1], "r");
+file = fopen(argv[1], "r");
+m.file = file;
 if (!file)
 {
 fprintf(stderr, "Error: Can't open file %s\n", argv[1]);
 exit(EXIT_FAILURE);
 }
-
-stack_t *stack = NULL;
-unsigned int line_number = 0;
-
-instruction_t instructions[] = {
-{"push", push},
-{"pall", pall},
-{NULL, NULL}
-};
-
-process_file(file, &stack, &line_number, instructions);
-
-fclose(file);
+while (read_line > 0)
+{
+content = NULL;
+read_line = getline(&content, &size, file);
+m.content = content;
+line_n++;
+if (read_line > 0)
+	executable(content, &stack, line_n, file);
+free(content);
+}
 free_stack(stack);
+fclose(file);
 
 return (0);
-}
-
-
-/**
- * process_file - Function to process a file
- * @file: The file
- * @stack: Pointer to stack
- * @line_number: Line number on the file
- * @instructions: Execution functions
- *
- * Return: NULL
- */
-
-void process_file(FILE *file, stack_t **stack,
-unsigned int *line_number, instruction_t *instructions)
-{
-char buffer[1024];
-
-while (fgets(buffer, sizeof(buffer), file))
-{
-(*line_number)++;
-
-char *opcode = strtok(buffer, " \t\n\r");
-if (opcode == NULL || opcode[0] == '#')
-continue;
-
-execute_instruction(opcode, stack, *line_number, instructions);
-}
-}
-
-/**
- * execute_instruction - Function to execute instructions
- * @opcode: Code in the file
- * @stack: Pointer to stack
- * @line_number: Line number on the file
- * @instructions: Execution functions
- *
- * Return: NULL
- */
-
-void execute_instruction(char *opcode, stack_t **stack,
-unsigned int line_number, instruction_t *instructions)
-{
-int i;
-for (i = 0; instructions[i].opcode != NULL; i++)
-{
-if (strcmp(opcode, instructions[i].opcode) == 0)
-{
-instructions[i].f(stack, line_number);
-break;
-}
-}
-
-if (instructions[i].opcode == NULL)
-{
-monty_error("L%u: unknown instruction %s\n", line_number, opcode);
-}
 }

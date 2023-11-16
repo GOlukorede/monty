@@ -11,13 +11,6 @@
 #include <stdarg.h>
 #include <sys/types.h>
 
-void push(stack_t **stack, int value, unsigned int line_number);
-void pall(stack_t **stack, unsigned int line_number);
-void process_file(FILE *file, stack_t **stack, unsigned int *line_number,
-instruction_t *instructions);
-void execute_instruction(char *opcode, stack_t **stack,
-unsigned int line_number, instruction_t *instructions);
-
 /**
  * struct stack_s - doubly linked list representation of a stack (or queue)
  * @n: integer
@@ -29,9 +22,9 @@ unsigned int line_number, instruction_t *instructions);
  */
 typedef struct stack_s
 {
-	int n;
-	struct stack_s *prev;
-	struct stack_s *next;
+int n;
+struct stack_s *prev;
+struct stack_s *next;
 } stack_t;
 
 /**
@@ -44,8 +37,8 @@ typedef struct stack_s
  */
 typedef struct instruction_s
 {
-	char *opcode;
-	void (*f)(stack_t **stack, unsigned int line_number);
+char *opcode;
+void (*f)(stack_t **stack, unsigned int line_number);
 } instruction_t;
 
 /**
@@ -58,11 +51,43 @@ typedef struct instruction_s
  */
 typedef struct monty_t
 {
-	char *arg;
-	FILE *file;
-	char *content;
-	int stackMode;
+char *arg;
+FILE *file;
+char *content;
+int stackMode;
 }  monty_t;
 extern monty_t m;
+
+
+ssize_t getstdin(char **lineptr, int file);
+char *clean_line(char *content);
+char *_realloc(char *ptr, unsigned int old_size, unsigned int new_size);
+
+
+void printChar(stack_t **head, unsigned int line_n);
+void print_top(stack_t **head, unsigned int line_n);
+void print_string(stack_t **head, unsigned int line_n);
+void print_top_stack(stack_t **head, unsigned int line_n);
+void pint(stack_t **head, unsigned int line_n);
+void pops(stack_t **head, unsigned int line_n);
+void push_d(stack_t **head, unsigned int line_n);
+void pall_d(stack_t **head, unsigned int line_n);
+void stack(stack_t **head, unsigned int line_n);
+void top_rotate(stack_t **head, __attribute__((unused)) unsigned int line_n);
+void bottom_rotate(stack_t **head,
+__attribute__((unused)) unsigned int line_n);
+void nop(stack_t **head, unsigned int line_n);
+void free_stack(stack_t *head);
+void add(stack_t **head, unsigned int line_n);
+void div(stack_t **head, unsigned int line_n);
+void mul(stack_t **head, unsigned int line_n);
+void sub(stack_t **head, unsigned int line_n);
+void mod(stack_t **head, unsigned int line_n);
+void add_node(stack_t **head, int n);
+void queue(stack_t **head, unsigned int line_n);
+void add_queue(stack_t **head, int n);
+void swap(stack_t **head, unsigned int line_n);
+int executable(char *content, stack_t **stack,
+unsigned int line_n, FILE *file);
 
 #endif
